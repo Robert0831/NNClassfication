@@ -558,9 +558,9 @@ def getlabel(set,idx):
     return np.array(labels)
 
 
-model1=fnn('weights_4.pkl')
-model2=LeNet5('Lanet_weights_1.pkl')
-model3=NLeNet5('NLanet_weights_5.pkl')
+model1=fnn('weights.pkl')
+model2=LeNet5('Lanet_weights.pkl')
+model3=NLeNet5('NLanet_weights.pkl')
 
 testpath=os.path.join(os.path.abspath(""),'test.txt')
 testset=pd.read_csv(testpath,sep=" ",header=None,names=["dir", "class"])
