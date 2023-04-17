@@ -458,7 +458,7 @@ def getlabel(set,idx):
     return np.array(labels)
 
 
-model=NLeNet5('NLanet_weights_3.pkl')
+model=NLeNet5()
 datapath=os.path.join(os.path.abspath(""),'train2.txt')
 dataset=pd.read_csv(datapath,sep=" ",header=None,names=["dir", "class"])
 
@@ -471,7 +471,7 @@ criterion = CrossEntropyLoss()
     
 totalt=len(dataset)
 totalv=len(valset)
-for epoch in range(4,10):
+for epoch in range(0,10):
     tt1s=0
     vt1s=0
     for idx in range(0,len(dataset),5):
