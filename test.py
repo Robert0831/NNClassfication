@@ -107,6 +107,7 @@ class Sigmoid():
 
     def _backward(self, dout):
         X = self.cache
+        X=1 / (1 + np.exp(-X))
         dX = dout*X*(1-X)
         return dX
 
