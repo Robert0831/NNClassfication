@@ -450,7 +450,7 @@ def getlabel(set,idx):
         labels.append(set['class'][int(idx+i)])
     return np.array(labels)
 
-model=fnn(weights="weights_9.pkl")
+model=fnn()
 datapath=os.path.join(os.path.abspath(""),'train2.txt')
 dataset=pd.read_csv(datapath,sep=" ",header=None,names=["dir", "class"])
 
@@ -464,7 +464,7 @@ criterion = CrossEntropyLoss()
     
 totalt=len(dataset)
 totalv=len(valset)
-for epoch in range(10,20):
+for epoch in range(0,10):
     tt1s=0
     vt1s=0
     for idx in range(0,len(dataset),5):
