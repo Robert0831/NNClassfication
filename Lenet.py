@@ -6,28 +6,23 @@ from abc import ABCMeta, abstractmethod
 import os
 import cv2
 import pandas as pd
-
+#讀pretrain model
 def load():
     with open("mnist.pkl",'rb') as f:
         mnist = pickle.load(f)
     return mnist["training_images"], mnist["training_labels"], mnist["test_images"], mnist["test_labels"]
-
+#維度改變
 def MakeOneHot(Y, D_out):
     N = Y.shape[0]
     Z = np.zeros((N, D_out))
     Z[np.arange(N), Y] = 1
     return Z
-
-def draw_losses(losses):
-    t = np.arange(len(losses))
-    plt.plot(t, losses)
-    plt.show()
-
+#取batch
 def get_batch(X, Y, batch_size):
     N = len(X)
     i = random.randint(1, N-batch_size)
     return X[i:i+batch_size], Y[i:i+batch_size]
-
+#Fully connected layer
 class FC():
     """
     Fully connected layer
@@ -79,6 +74,7 @@ class ReLU():
         dX = np.array(dout, copy=True)
         dX[X <= 0] = 0
         return dX
+
 class tanh():
     """
     tanh activation layer
@@ -94,6 +90,7 @@ class tanh():
         X = self.cache
         dX = dout*(1 - np.tanh(X)**2)
         return dX
+
 class Sigmoid():
     """
     Sigmoid activation layer
@@ -145,7 +142,7 @@ class Softmax():
         dX = np.dot(dX,dY)
         return dX
 
-
+#CNN
 class Conv():
     """
     Conv layer
@@ -237,33 +234,31 @@ class MaxPool():
                         M[n,cin,F*w_+i,F*h_+j] = 1
         self.cache = M
         return Y
-
+    #可能會有奇數的情形,用補0解決
     def _backward(self, dout):
         M = self.cache
         (N,Cin,H,W) = M.shape
         dout = np.array(dout)
+        (a1,a2,a3,a4)=dout.shape
         #print("dout.shape: %s, M.shape: %s" % (dout.shape, M.shape))
-        dX = np.zeros(M.shape)
-        for n in range(N):
-            for c in range(Cin):
-                #print("(n,c): (%s,%s)" % (n,c))
-                dX[n,c,:,:] = dout[n,c,:,:].repeat(2, axis=0).repeat(2, axis=1)
-        return dX*M
-
-def NLLLoss(Y_pred, Y_true):
-    """
-    Negative log likelihood loss
-    """
-    loss = 0.0
-    N = Y_pred.shape[0]
-    M = np.sum(Y_pred*Y_true, axis=1)
-    for e in M:
-        if np.all(e) == 0:
-            loss += 500
+        if a3*2!=H:
+            dX = np.zeros((N,Cin,H-1,W-1))
+            dXX=np.zeros((N,Cin,H,W))
+            for n in range(N):
+                for c in range(Cin):
+                    #print("(n,c): (%s,%s)" % (n,c))
+                    dX[n,c,:,:] = dout[n,c,:,:].repeat(2, axis=0).repeat(2, axis=1)
+            dXX[:,:,:-1,:-1]=dX
+            return dXX*M
+        
         else:
-            loss += -np.log(e)
-    return loss/N
-
+            dX = np.zeros(M.shape)
+            for n in range(N):
+                for c in range(Cin):
+                    #print("(n,c): (%s,%s)" % (n,c))
+                    dX[n,c,:,:] = dout[n,c,:,:].repeat(2, axis=0).repeat(2, axis=1)
+            return dX*M
+        
 class CrossEntropyLoss():
     def __init__(self):
         pass
@@ -278,19 +273,7 @@ class CrossEntropyLoss():
         dout[np.arange(N), Y_serial] -= 1
         #return loss, dout
         return dout
-
-class SoftmaxLoss():
-    def __init__(self):
-        pass
-
-    def get(self, Y_pred, Y_true):
-        N = Y_pred.shape[0]
-        loss = NLLLoss(Y_pred, Y_true)
-        Y_serial = np.argmax(Y_true, axis=1)
-        dout = Y_pred.copy()
-        dout[np.arange(N), Y_serial] -= 1
-        return loss, dout
-
+    
 class Net(metaclass=ABCMeta):
     # Neural network super class
 
@@ -347,8 +330,8 @@ class LeNet5(Net):
         p2 = self.pool2._forward(a2)
         h3=self.conv3._forward(p2)
 
-        self.p3_shape = h3.shape
-        fl = h3.reshape(X.shape[0],-1) # Flatten
+        self.p3_shape = h3.shape        #back會用到
+        fl = h3.reshape(X.shape[0],-1) # Flatten (batch,其他)
         h4 = self.FC1._forward(fl)
         a4 = self.sig3._forward(h4)
         h5 = self.FC2._forward(a4)
@@ -443,15 +426,7 @@ for epoch in range(0,10):
     tt1s=0
     vt1s=0
     for idx in range(0,len(dataset),5):
-        # img=dataset['dir'][idx]
-        # img = cv2.imread(img)
-        # img = cv2.resize(img, (256, 256))
-        # img=img/255
-        # img=np.expand_dims(img,0)
-        # img=img.transpose(0,3,1,2)
-        # label=dataset['class'][idx]
 
-        # label = tolabel(label)
         img=getimg(dataset,idx)
         label=getlabel(dataset,idx)
         label=MakeOneHot(label,50)
