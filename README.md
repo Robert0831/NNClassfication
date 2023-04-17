@@ -25,3 +25,7 @@ LeNet5:[Lanet_weights.pkl](https://github.com/Robert0831/NNClassfication/blob/ma
 Improved LeNet5:[NLanet_weights.pkl](https://github.com/Robert0831/NNClassfication/blob/main/weights.pkl)
 
 if want to load pretrain model,there have be a line is  EX.model=LeNet5(weights="pretrain model flie name") 
+
+Reference
+----------------------------------------------------------------------------
+Reference code: https://github.com/toxtli/lenet-5-mnist-from-scratch-numpy
