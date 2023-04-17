@@ -1,3 +1,4 @@
+# Image Classfication
 Train model,use [train2.txt](https://github.com/Robert0831/NNClassfication/blob/main/train2.txt) data ,it is shuffled training set ,and you need to put the data in the folder [images](https://github.com/Robert0831/NNClassfication/tree/main/image)
 ----------------------------------------------------------------------------
 
