@@ -17,11 +17,7 @@ def MakeOneHot(Y, D_out):
     Z = np.zeros((N, D_out))
     Z[np.arange(N), Y] = 1
     return Z
-#取batch
-def get_batch(X, Y, batch_size):
-    N = len(X)
-    i = random.randint(1, N-batch_size)
-    return X[i:i+batch_size], Y[i:i+batch_size]
+
 #Fully connected layer
 class FC():
     """
@@ -384,12 +380,8 @@ class SGDMomentum():
             self.velocities[i] = self.rho*self.velocities[i] + (1-self.rho)*self.parameters[i]['grad']
             self.parameters[i]['val'] -= (self.lr*self.velocities[i] + self.reg*self.parameters[i]['val'])
 
-def tolabel(y):
-    a=np.zeros((1,50))
-    a[0][y]=1
-    return np.expand_dims(a,0)
 
-
+#取batch
 def getimg(set,idx):
     images=[]
     for i in range(5):
